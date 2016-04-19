@@ -1,6 +1,9 @@
 package com.byteflair.resthooks.events;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -14,7 +17,6 @@ import java.time.LocalDateTime;
 @Getter
 @EqualsAndHashCode
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "events")
 public class Event implements Identifiable<String>{
@@ -27,4 +29,10 @@ public class Event implements Identifiable<String>{
     private String payload;
     @Field
     private LocalDateTime timestamp;
+
+    public Event(EventStatus status, String payload, LocalDateTime timestamp) {
+        this.status = status;
+        this.payload = payload;
+        this.timestamp = timestamp;
+    }
 }

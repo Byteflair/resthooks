@@ -1,7 +1,7 @@
 package com.byteflair.resthooks.journal;
 
 import com.byteflair.resthooks.events.Event;
-import com.byteflair.resthooks.events.EventRepository;
+import com.byteflair.resthooks.events.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Resource;
@@ -13,18 +13,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LogEntryResourceProcessor implements ResourceProcessor<Resource<LogEntry>> {
-    private EventRepository eventRepository;
+    private EventService eventService;
     private RepositoryEntityLinks repositoryEntityLinks;
 
     @Autowired
-    public LogEntryResourceProcessor(EventRepository eventRepository, RepositoryEntityLinks repositoryEntityLinks) {
-        this.eventRepository = eventRepository;
+    public LogEntryResourceProcessor(EventService eventService, RepositoryEntityLinks repositoryEntityLinks) {
+        this.eventService = eventService;
         this.repositoryEntityLinks = repositoryEntityLinks;
     }
 
     @Override
     public Resource<LogEntry> process(Resource<LogEntry> logEntryResource) {
-        Event event= eventRepository.findOne(logEntryResource.getContent().getEventId());
+        Event event = eventService.findOne(logEntryResource.getContent().getEventId());
         logEntryResource.add(repositoryEntityLinks.linkToSingleResource(event));
         return logEntryResource;
     }
