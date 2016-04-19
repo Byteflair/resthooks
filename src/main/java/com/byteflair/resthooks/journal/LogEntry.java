@@ -1,18 +1,12 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.journal;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.hateoas.Identifiable;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Created by Daniel Cerecedo <daniel.cerecedo@byteflair.com> on 15/04/16.
@@ -22,15 +16,17 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "events")
-public class Event implements Identifiable<String>{
+@Document(collection = "journal")
+public class LogEntry implements Identifiable<String>{
     @Field
     @Id
     private String id;
     @Field
-    private EventStatus status;
+    private String eventId;
     @Field
-    private String payload;
+    private LogLevel level;
+    @Field
+    private String message;
     @Field
     private LocalDateTime timestamp;
 }

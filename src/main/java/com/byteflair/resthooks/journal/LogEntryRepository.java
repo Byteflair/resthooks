@@ -1,4 +1,4 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.journal;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

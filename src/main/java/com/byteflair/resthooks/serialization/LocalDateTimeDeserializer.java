@@ -1,4 +1,4 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.serialization;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;

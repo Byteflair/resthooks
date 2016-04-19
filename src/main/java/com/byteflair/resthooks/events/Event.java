@@ -1,14 +1,11 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.events;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.hateoas.Identifiable;
 
-import java.net.URL;
 import java.time.LocalDateTime;
 
 /**
@@ -18,17 +15,16 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-@Document
-public class Subscription {
+@NoArgsConstructor
+@Document(collection = "events")
+public class Event implements Identifiable<String>{
     @Field
     @Id
     private String id;
     @Field
-    private String topic;
+    private EventStatus status;
     @Field
-    private int maximunRetries;
-    @Field
-    private URL callback;
+    private String payload;
     @Field
     private LocalDateTime timestamp;
 }

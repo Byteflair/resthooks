@@ -1,4 +1,4 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.subscriptions;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
