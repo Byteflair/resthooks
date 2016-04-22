@@ -214,7 +214,7 @@ public class AmqpService {
         String namespacedQueue = namespace.concat(".").concat(queueName);
         String namespacedExchange = namespace.concat(".").concat(exchangeName);
 
-        Assert.isTrue(externalQueueNames.containsKey(queueName));
+        Assert.isTrue(externalQueueNames.containsKey(namespace.concat(".").concat(queueName)));
         Assert.notNull(getExchangeByNamespacedName(exchangeName));
 
         registerListener(namespacedQueue, message->{
