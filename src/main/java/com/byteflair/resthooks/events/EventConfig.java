@@ -29,4 +29,9 @@ public class EventConfig {
     EventResourceProcessor eventResourceProcessor(LogEntryRepository logEntryRepository, RepositoryEntityLinks repositoryEntityLinks) {
         return new EventResourceProcessor(logEntryRepository, repositoryEntityLinks);
     }
+
+    @Bean
+    EventController eventController() {
+        return new EventController();
+    }
 }
