@@ -1,4 +1,4 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.conf;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -7,16 +7,14 @@ import com.mongodb.ServerAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
-
-import java.util.List;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * Created by Daniel Cerecedo <daniel.cerecedo@byteflair.com> on 15/04/16.
  */
 @Configuration
+@EnableMongoRepositories(basePackages = "com.byteflair.resthooks")
 public class MongoConfig extends AbstractMongoConfiguration{
     @Value("${spring.data.mongodb.db}")
     private String databaseName;

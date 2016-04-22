@@ -1,4 +1,4 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.conf;
 
 import com.byteflair.resthooks.serialization.LocalDateTimeDeserializer;
 import com.byteflair.resthooks.serialization.LocalDateTimeSerializer;

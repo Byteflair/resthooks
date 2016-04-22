@@ -1,13 +1,13 @@
-package com.byteflair.resthooks.events;
+package com.byteflair.resthooks.subscriptions;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +28,7 @@ public class AmqpConfig {
     private String username;
     @Value("${spring.rabbitmq.password:}")
     private String password;
-    @Value("${resthooks.queue:resthooks.queue}")
-    private String queueName;
-    @Value("${resthooks.exchange:resthooks.exchange}")
+    @Value("${resthooks.exchange:firehose}")
     private String exchangeName;
 
     @Bean
@@ -74,31 +72,9 @@ public class AmqpConfig {
     }
 
     @Bean
-    Queue queue() {
-        return new Queue(queueName, false);
+    @Autowired
+    AmqpService amqpService(AmqpAdmin amqpAdmin, ConnectionFactory connectionFactory, AmqpTemplate amqpTemplate) {
+        return new AmqpService(amqpAdmin, connectionFactory, amqpTemplate);
     }
 
-    @Bean
-    TopicExchange exchange() {
-        return new TopicExchange(exchangeName);
-    }
-
-    @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(queueName);
-    }
-
-    @Bean
-    SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
-        container.setMessageListener(listenerAdapter);
-        return container;
-    }
-
-    @Bean
-    MessageListenerAdapter listenerAdapter(EventReceiver eventReceiver) {
-        return new MessageListenerAdapter(eventReceiver);
-    }
 }

@@ -24,6 +24,8 @@ public class Subscription {
     @Id
     private String id;
     @Field
+    private String subscriptor;
+    @Field
     private String topic;
     @Field
     private int maximunRetries;

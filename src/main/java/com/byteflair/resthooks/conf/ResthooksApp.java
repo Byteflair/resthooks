@@ -1,4 +1,4 @@
-package com.byteflair.resthooks;
+package com.byteflair.resthooks.conf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
