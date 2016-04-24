@@ -8,6 +8,8 @@ import com.byteflair.resthooks.journal.EventStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
+import org.springframework.hateoas.Link;
+import org.springframework.http.ResponseEntity;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
@@ -66,11 +68,13 @@ public class EventConsumer implements MessageListener {
                     backOffPolicy.setMultiplier(subscription.getMultiplier());
                     template.setBackOffPolicy(backOffPolicy);
                     template.execute(context->{
-                        Object object = restTemplate.postForEntity(subscription.getCallbackUrl(), event, String.class);
+                        Link payload = new Link("", "");
+                        ResponseEntity response = restTemplate
+                            .postForEntity(subscription.getCallbackUrl(), payload, String.class);
                         EventLog requestLog = new EventLog(subscriptionId, event.getId(), EventStatus.ACKNOWLEDGED,
                                                            LocalDateTime.now(ZoneId.of("UTC")));
                         eventLogRepository.save(requestLog);
-                        return object;
+                        return response;
                     });
                 }
             }
