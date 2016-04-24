@@ -1,6 +1,9 @@
 package com.byteflair.resthooks.journal;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -14,19 +17,25 @@ import java.time.LocalDateTime;
 @Getter
 @EqualsAndHashCode
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "journal")
-public class LogEntry implements Identifiable<String>{
+public class EventLog implements Identifiable<String> {
     @Field
     @Id
     private String id;
     @Field
+    private String subscriptionId;
+    @Field
     private String eventId;
     @Field
-    private LogLevel level;
-    @Field
-    private String message;
+    private EventStatus status;
     @Field
     private LocalDateTime timestamp;
+
+    public EventLog(String subscriptionId, String eventId, EventStatus status, LocalDateTime timestamp) {
+        this.subscriptionId = subscriptionId;
+        this.eventId = eventId;
+        this.status = status;
+        this.timestamp = timestamp;
+    }
 }

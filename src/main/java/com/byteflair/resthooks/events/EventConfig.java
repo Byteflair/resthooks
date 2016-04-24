@@ -1,7 +1,6 @@
 package com.byteflair.resthooks.events;
 
-import com.byteflair.resthooks.journal.LogEntryRepository;
-import com.byteflair.resthooks.subscriptions.EventListener;
+import com.byteflair.resthooks.journal.EventLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +17,11 @@ public class EventConfig {
         return new EventService(eventRepository);
     }
 
-    @Bean
-    @Autowired
-    EventListener eventReceiver(EventService eventService) {
-        return new EventListener(eventService);
-    }
 
     @Bean
     @Autowired
-    EventResourceProcessor eventResourceProcessor(LogEntryRepository logEntryRepository, RepositoryEntityLinks repositoryEntityLinks) {
-        return new EventResourceProcessor(logEntryRepository, repositoryEntityLinks);
+    EventResourceProcessor eventResourceProcessor(EventLogRepository eventLogRepository, RepositoryEntityLinks repositoryEntityLinks) {
+        return new EventResourceProcessor(eventLogRepository, repositoryEntityLinks);
     }
 
     @Bean

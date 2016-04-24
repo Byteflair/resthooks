@@ -6,7 +6,6 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
@@ -38,6 +37,7 @@ public class AmqpService {
     private AmqpAdmin amqpAdmin;
     private ConnectionFactory connectionFactory;
     private AmqpTemplate amqpTemplate;
+    private MessageListener eventPreprocessor;
 
     private Map<String, Exchange> exchangeMap = new HashMap<>();
     private List<Binding> bindings = new ArrayList<>();
@@ -45,11 +45,17 @@ public class AmqpService {
     private Map<String, String> externalQueueNames = new HashMap<>();
     private List<String> internalQueueNames = new ArrayList<>();
 
-    @Autowired
     public AmqpService(AmqpAdmin amqpAdmin, ConnectionFactory connectionFactory, AmqpTemplate amqpTemplate) {
         this.amqpAdmin = amqpAdmin;
         this.connectionFactory = connectionFactory;
         this.amqpTemplate = amqpTemplate;
+    }
+
+    /**
+     * A message listener that processes events before sending them to consumers
+     */
+    public void setEventPreProcessor(MessageListener listener) {
+        this.eventPreprocessor = listener;
     }
 
     public void subscribe(String eventType, MessageListener consumer) {
@@ -103,7 +109,7 @@ public class AmqpService {
         registerNamespacedQueue(routingKey);
         registerNamespacedBinding(routingKey, entry, routingKey);
         registerNamespacedExchange(routingKey, FanoutExchange.class);
-        declareNamespacedBridge(routingKey);
+        declareNamespacedBridge(routingKey, routingKey, this.eventPreprocessor);
     }
 
     private String registerQueue(String name, Boolean durable, Boolean exclusive, Boolean autoDelete) {
@@ -116,6 +122,8 @@ public class AmqpService {
             //si se borra sola cuando me desconecto no necesito borrarla y no la registro
             internalQueueNames.add(actualName);
         }
+        LOGGER.debug("Registered queue {} with actual name {} as durable: {}; exclusive: {}; autodelete: {};", name,
+                     actualName, durable, exclusive, autoDelete);
         return actualName;
     }
 
@@ -123,6 +131,8 @@ public class AmqpService {
         Binding binding = new Binding(queueName, Binding.DestinationType.QUEUE, exchange, routingKey, null);
         amqpAdmin.declareBinding(binding);
         bindings.add(binding);
+        LOGGER
+            .debug("Registered binding from exchange {} to queue {} with routing {}", exchange, queueName, routingKey);
     }
 
     /**
@@ -138,6 +148,7 @@ public class AmqpService {
         container.setMessageListener(listener);
         container.start();
         listeners.add(container);
+        LOGGER.debug("Registered listener on queue {}", queueName);
     }
 
     /**
@@ -180,13 +191,26 @@ public class AmqpService {
         }
     }
 
-    /**
-     * Creates a bridge from a queue to an exchange both with the same name
-     *
-     * @param key
-     */
-    private void declareNamespacedBridge(String key) {
-        declareNamespacedBridge(key, key);
+    private void declareNamespacedBridge(String queueName, String exchangeName, MessageListener listener) {
+        String namespacedQueue = namespace.concat(".").concat(queueName);
+        String namespacedExchange = namespace.concat(".").concat(exchangeName);
+
+        Assert.isTrue(externalQueueNames.containsKey(namespace.concat(".").concat(queueName)));
+        Assert.notNull(getExchangeByNamespacedName(exchangeName));
+
+        registerListener(namespacedQueue, message->{
+            LOGGER
+                .debug("Bridging from queue: {}; with routing key: {}, to exchange: {}; message: {};", namespacedQueue,
+                       message.getMessageProperties().getReceivedRoutingKey(), namespacedExchange,
+                       new String(message.getBody()));
+            if (listener != null) {
+                LOGGER.debug("Pre-processing message...");
+                listener.onMessage(message);
+                LOGGER.debug("Message pre-processed!");
+            }
+            amqpTemplate.send(namespacedExchange, message.getMessageProperties().getReceivedRoutingKey(), message);
+            LOGGER.debug("Message bridged!");
+        });
     }
 
     /**
@@ -205,23 +229,22 @@ public class AmqpService {
     }
 
     /**
+     * Creates a bridge from a queue to an exchange both with the same name
+     *
+     * @param key
+     */
+    private void declareNamespacedBridge(String key) {
+        declareNamespacedBridge(key, key);
+    }
+
+    /**
      * Creates a bridge from a queue to an exchange
      *
      * @param queueName
      * @param exchangeName
      */
     private void declareNamespacedBridge(String queueName, String exchangeName) {
-        String namespacedQueue = namespace.concat(".").concat(queueName);
-        String namespacedExchange = namespace.concat(".").concat(exchangeName);
-
-        Assert.isTrue(externalQueueNames.containsKey(namespace.concat(".").concat(queueName)));
-        Assert.notNull(getExchangeByNamespacedName(exchangeName));
-
-        registerListener(namespacedQueue, message->{
-            LOGGER.debug("Bridging message from queue: {}; with routing key: {}, to exchange: {}", namespacedQueue,
-                         message.getMessageProperties().getReceivedRoutingKey(), namespacedExchange);
-            amqpTemplate.send(namespacedExchange, message.getMessageProperties().getReceivedRoutingKey(), message);
-        });
+        declareNamespacedBridge(queueName, exchangeName, null);
     }
 
     //testability

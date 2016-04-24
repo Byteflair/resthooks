@@ -18,7 +18,4 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public void trigger(Event event) {
-
-    }
 }

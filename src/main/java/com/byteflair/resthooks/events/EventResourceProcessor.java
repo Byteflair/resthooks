@@ -1,7 +1,7 @@
 package com.byteflair.resthooks.events;
 
-import com.byteflair.resthooks.journal.LogEntry;
-import com.byteflair.resthooks.journal.LogEntryRepository;
+import com.byteflair.resthooks.journal.EventLog;
+import com.byteflair.resthooks.journal.EventLogRepository;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
@@ -12,18 +12,20 @@ import java.util.List;
  * Created by Daniel Cerecedo <daniel.cerecedo@byteflair.com> on 15/04/16.
  */
 public class EventResourceProcessor implements ResourceProcessor<Resource<Event>> {
-    private LogEntryRepository logEntryRepository;
+    private EventLogRepository eventLogRepository;
     private RepositoryEntityLinks repositoryEntityLinks;
 
-    public EventResourceProcessor(LogEntryRepository logEntryRepository, RepositoryEntityLinks repositoryEntityLinks) {
-        this.logEntryRepository = logEntryRepository;
+    public EventResourceProcessor(EventLogRepository eventLogRepository, RepositoryEntityLinks repositoryEntityLinks) {
+        this.eventLogRepository = eventLogRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
     }
 
     @Override
     public Resource<Event> process(Resource<Event> eventResource) {
-        List<LogEntry> history=logEntryRepository.findByEventIdOrderByTimestampDesc(eventResource.getContent().getId());
-        eventResource.add(repositoryEntityLinks.linkToSearchResource(LogEntry.class, "journal").expand(eventResource.getContent().getId()));
+        List<EventLog> history = eventLogRepository
+            .findByEventIdOrderByTimestampDesc(eventResource.getContent().getId());
+        eventResource.add(repositoryEntityLinks.linkToSearchResource(EventLog.class, "journal")
+                                               .expand(eventResource.getContent().getId()));
         return eventResource;
     }
 }

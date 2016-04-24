@@ -24,15 +24,15 @@ public class Event implements Identifiable<String>{
     @Id
     private String id;
     @Field
-    private EventStatus status;
-    @Field
     private String payload;
     @Field
     private LocalDateTime timestamp;
+    @Field
+    private boolean valid;
 
-    public Event(EventStatus status, String payload, LocalDateTime timestamp) {
-        this.status = status;
+    public Event(String payload, LocalDateTime timestamp, boolean valid) {
         this.payload = payload;
         this.timestamp = timestamp;
+        this.valid = valid;
     }
 }

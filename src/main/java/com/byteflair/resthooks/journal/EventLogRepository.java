@@ -11,8 +11,8 @@ import java.util.List;
  * Created by Daniel Cerecedo <daniel.cerecedo@byteflair.com> on 15/04/16.
  */
 @RepositoryRestResource(path = "journal", collectionResourceRel = "journal", itemResourceRel = "log")
-public interface LogEntryRepository extends PagingAndSortingRepository<LogEntry, String> {
+public interface EventLogRepository extends PagingAndSortingRepository<EventLog, String> {
 
     @RestResource(path = "event", rel = "journal")
-    List<LogEntry> findByEventIdOrderByTimestampDesc(@Param("event-id") String eventId);
+    List<EventLog> findByEventIdOrderByTimestampDesc(@Param("event-id") String eventId);
 }

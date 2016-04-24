@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.net.URL;
 import java.time.LocalDateTime;
 
 /**
@@ -28,9 +27,13 @@ public class Subscription {
     @Field
     private String topic;
     @Field
-    private int maximunRetries;
+    private long initialInterval;
     @Field
-    private URL callback;
+    private long maximunInterval;
+    @Field
+    private double multiplier;
+    @Field
+    private String callbackUrl;
     @Field
     private LocalDateTime timestamp;
 }

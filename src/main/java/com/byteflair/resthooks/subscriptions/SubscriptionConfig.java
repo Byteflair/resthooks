@@ -1,6 +1,7 @@
 package com.byteflair.resthooks.subscriptions;
 
 import com.byteflair.resthooks.events.EventService;
+import com.byteflair.resthooks.journal.EventLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class SubscriptionConfig {
     @Bean
     @Autowired
-    SubscriptionHandler subscriptionService(AmqpService amqpService, EventService eventService) {
-        return new SubscriptionHandler(amqpService, eventService);
+    SubscriptionHandler subscriptionService(AmqpService amqpService, EventService eventService, EventLogRepository eventLogRepository, SubscriptionRepository subscriptionRepository) {
+        return new SubscriptionHandler(amqpService, eventService, eventLogRepository, subscriptionRepository);
     }
 }
