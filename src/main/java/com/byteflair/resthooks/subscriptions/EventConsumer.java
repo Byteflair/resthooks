@@ -19,6 +19,14 @@ import java.time.ZoneId;
 
 /**
  * Created by Daniel Cerecedo <daniel.cerecedo@byteflair.com> on 19/04/16.
+ *
+ * The subscription system creates an EventConsumer per each Subscription created.
+ * The EventConsumer only receives events of a specific type and subcriber.
+ *
+ * The main task of the EventConsumer is consume the Event that has entered the system
+ * and notify it via the Subscription callbackk url to the corresponding subscriber.
+ * The system does not send the whole payload of the Event to the subscriber but a
+ * reference to the Event.
  */
 @Slf4j
 public class EventConsumer implements MessageListener {

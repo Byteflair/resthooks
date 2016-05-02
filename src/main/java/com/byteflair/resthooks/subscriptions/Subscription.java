@@ -33,6 +33,10 @@ public class Subscription {
     @Field
     private double multiplier;
     @Field
+    private String securityTokenName;
+    @Field
+    private String securityTokenValue;
+    @Field
     private String callbackUrl;
     @Field
     private LocalDateTime timestamp;
